@@ -1,6 +1,10 @@
+
+jwt.secretKey: skjdsnoi34$OWED*(@ENOSENDKNZDlxndsljfscbkxjfbskjfbzkxmzxclxcjnsf
+
 spring:
   application:
     name: api-gateway
+
 
   server:
     port: 8080
@@ -25,6 +29,7 @@ spring:
                 - Path=/api/v1/posts/**
               filters:
                 - StripPrefix=2
+                - name: AuthenticationFilter
 
             - id: connections-service
               uri: lb://CONNECTIONS-SERVICE
@@ -32,3 +37,4 @@ spring:
                 - Path=/api/v1/connections/**
               filters:
                 - StripPrefix=2
+                - name: AuthenticationFilter

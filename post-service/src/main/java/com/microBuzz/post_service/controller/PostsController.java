@@ -3,7 +3,6 @@ package com.microBuzz.post_service.controller;
 import com.microBuzz.post_service.dto.PostCreateRequestDto;
 import com.microBuzz.post_service.dto.PostDto;
 import com.microBuzz.post_service.service.PostService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +17,9 @@ public class PostsController {
 
     private final PostService postService;
 
-    @PostMapping
-    public ResponseEntity<PostDto> createPost(@RequestBody PostCreateRequestDto postDto, HttpServletRequest httpServletRequest) {
-        PostDto createdPost = postService.createPost(postDto, 1L);
+    @PostMapping("/createPost")
+    public ResponseEntity<PostDto> createPost(@RequestBody PostCreateRequestDto postDto) {
+        PostDto createdPost = postService.createPost(postDto);
         return new ResponseEntity<>(createdPost, HttpStatus.CREATED);
     }
 
@@ -30,9 +29,9 @@ public class PostsController {
         return ResponseEntity.ok(postDto);
     }
 
-    @GetMapping("/users/{userId}/allPosts")
-    public ResponseEntity<List<PostDto>> getAllPostsOfUser(@PathVariable Long userId) {
-        List<PostDto> posts = postService.getAllPostsOfUser(userId);
+    @GetMapping("/users/allPosts")
+    public ResponseEntity<List<PostDto>> getAllPostsOfUser() {
+        List<PostDto> posts = postService.getAllPostsOfUser();
         return ResponseEntity.ok(posts);
     }
 
