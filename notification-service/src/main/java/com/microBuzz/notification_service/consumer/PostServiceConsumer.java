@@ -25,7 +25,7 @@ public class PostServiceConsumer {
     public void handlePostCreated(PostCreatedEvent postCreatedEvent){
 
         log.info("Sending notifications: handlePostCreated: {}", postCreatedEvent);
-        List<PersonDto> firstDegreeConnections= connectionsClient.getMyFirstConnections(postCreatedEvent.getCreatorId());
+        List<PersonDto> firstDegreeConnections= connectionsClient.getMyFollowers(postCreatedEvent.getCreatorId());
 
         for(PersonDto connection: firstDegreeConnections){
             log.info("Sending notification for user, Current user is: {}",connection.getUserId());

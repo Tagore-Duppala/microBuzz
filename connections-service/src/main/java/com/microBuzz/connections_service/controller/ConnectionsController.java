@@ -1,6 +1,6 @@
 package com.microBuzz.connections_service.controller;
 
-import com.microBuzz.connections_service.entity.Person;
+import com.microBuzz.connections_service.dto.PersonDto;
 import com.microBuzz.connections_service.service.ConnectionsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +19,36 @@ public class ConnectionsController {
     private final ConnectionsService connectionsService;
 
     @GetMapping("/first-degree")
-    public ResponseEntity<List<Person>> getMyFirstConnections(){
+    public ResponseEntity<List<PersonDto>> getMyFirstConnections(){
         return ResponseEntity.ok(connectionsService.getFirstDegreeConnections());
+    }
+
+    @GetMapping("/follow/{followUserId}")
+    public ResponseEntity<Void> followUser(@PathVariable Long followUserId){
+        connectionsService.followUser(followUserId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/unfollow/{followUserId}")
+    public ResponseEntity<Void> unfollowUser(@PathVariable Long followUserId){
+        connectionsService.unfollowUser(followUserId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("followers")
+    public ResponseEntity<List<PersonDto>> getMyFollowers(){
+        return ResponseEntity.ok(connectionsService.getMyFollowers());
+    }
+
+    @GetMapping("following")
+    public ResponseEntity<List<PersonDto>> getMyFollowing(){
+        return ResponseEntity.ok(connectionsService.getMyFollowing());
+    }
+
+    @GetMapping("/remove-follower/{followerUserId}")
+    public ResponseEntity<Void> removeFollower(@PathVariable Long followerUserId){
+        connectionsService.removeFollower(followerUserId);
+        return ResponseEntity.noContent().build();
     }
 
 

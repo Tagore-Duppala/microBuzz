@@ -63,8 +63,6 @@ public class PostServiceImpl implements PostService {
         log.info("Current user is: {}", userId);
         List<Post> posts = postRepository.findByUserId(userId);
 
-        List<PersonDto> connections = connectionsClient.getMyFirstConnections();
-
         return posts
                 .stream()
                 .map((element) -> modelMapper.map(element, PostDto.class))
