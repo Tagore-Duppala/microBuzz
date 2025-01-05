@@ -11,16 +11,16 @@ import org.springframework.web.server.ServerWebExchange;
 
 @Slf4j
 @Component
-public class AuthenticationFilter extends AbstractGatewayFilterFactory<AuthenticationFilter.Config> {
+public class AuthenticationFilter extends AbstractGatewayFilterFactory<Object> {
 
     private final JwtService jwtService;
 
     public AuthenticationFilter(JwtService jwtService){
-        super(Config.class);
+        super(Object.class);
         this.jwtService = jwtService;
     }
     @Override
-    public GatewayFilter apply(Config config) {
+    public GatewayFilter apply(Object config) { //This method is for adding custom filter in filter chain of API Gateway
         return (exchange, chain) -> {
             log.info("Login request: {}", exchange.getRequest().getURI());
 
@@ -40,7 +40,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                         .request(r -> r.header("X-User-id", userId))
                         .build();
                 log.info("final request headers are : {}",modifiedExchange.getRequest().getHeaders());
-                return chain.filter(modifiedExchange);
+                return chain.filter(modifiedExchange); //Pass the request to next filters   
 
             }
             catch (JwtException e){
@@ -51,8 +51,5 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
         };
     }
 
-    public static class Config{
-
-    }
 
 }

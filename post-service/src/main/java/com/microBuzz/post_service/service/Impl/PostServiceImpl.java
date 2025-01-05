@@ -6,11 +6,13 @@ import com.microBuzz.post_service.dto.PersonDto;
 import com.microBuzz.post_service.dto.PostCreateRequestDto;
 import com.microBuzz.post_service.dto.PostDto;
 import com.microBuzz.post_service.entity.Post;
+import com.microBuzz.post_service.event.PostCreatedEvent;
 import com.microBuzz.post_service.repository.PostRepository;
 import com.microBuzz.post_service.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +26,7 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final ModelMapper modelMapper;
     private final ConnectionsClient connectionsClient;
+    private final KafkaTemplate<Long, PostCreatedEvent> kafkaTemplate;
 
     public PostDto createPost(PostCreateRequestDto postDto) {
 
@@ -33,6 +36,15 @@ public class PostServiceImpl implements PostService {
         post.setUserId(userId);
 
         Post savedPost = postRepository.save(post);
+
+        PostCreatedEvent postCreatedEvent = PostCreatedEvent.builder()
+                .postId(savedPost.getId())
+                .creatorId(savedPost.getUserId())
+                .content(savedPost.getContent())
+                .build();
+
+        kafkaTemplate.send("post-created-topic",postCreatedEvent);
+
         return modelMapper.map(savedPost, PostDto.class);
     }
 
