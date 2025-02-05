@@ -23,6 +23,8 @@ public class Notification {
 
     private String message;
 
+    private Type category;
+
     @CreationTimestamp
     private LocalDateTime creationAt;
 }

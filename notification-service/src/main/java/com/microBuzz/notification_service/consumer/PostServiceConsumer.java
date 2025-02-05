@@ -3,6 +3,7 @@ package com.microBuzz.notification_service.consumer;
 import com.microBuzz.notification_service.clients.ConnectionsClient;
 import com.microBuzz.notification_service.dto.PersonDto;
 import com.microBuzz.notification_service.entity.Notification;
+import com.microBuzz.notification_service.entity.Type;
 import com.microBuzz.notification_service.repository.NotificationRepository;
 import com.microBuzz.post_service.event.PostCreatedEvent;
 import com.microBuzz.post_service.event.PostLikedEvent;
@@ -30,7 +31,7 @@ public class PostServiceConsumer {
         for(PersonDto connection: firstDegreeConnections){
             log.info("Sending notification for user, Current user is: {}",connection.getUserId());
             sendNotification(connection.getUserId(), "Your connection "+postCreatedEvent.getCreatorId()+ " posted something "
-                            + " check it out!");
+                            + " check it out!", Type.POST);
         }
 
     }
@@ -40,16 +41,17 @@ public class PostServiceConsumer {
 
         log.info("Sending notifications: handlePostLiked: {}", postLikedEvent);
         String message = String.format("Your post, %d has been liked by %d", postLikedEvent.getPostId(), postLikedEvent.getLikedByUserId());
-        sendNotification(postLikedEvent.getCreatorId(), message);
+        sendNotification(postLikedEvent.getCreatorId(), message, Type.LIKE);
         log.info("Notification sent for user: {}", postLikedEvent.getCreatorId());
 
     }
 
-    public void sendNotification(Long userId, String message){
+    public void sendNotification(Long userId, String message, Type category){
         Notification notification = new Notification();
 
         notification.setUserId(userId);
         notification.setMessage(message);
+        notification.setCategory(category);
 
         notificationRepository.save(notification);
         log.info("Successfully saved the notification for user with id {}",userId);
