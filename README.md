@@ -22,3 +22,14 @@ MicroBuzz is a microblogging application that allows users to share their though
 # E-R Diagram:
 
 ![microBuzz](https://github.com/user-attachments/assets/40da50e8-1f59-4766-a4a7-56210cf6c39e)
+
+# Contribute:
+Feel free to contribute to this project by submitting issues, suggesting features, or creating pull requests. Your input is valuable to make this tool even better! 😃
+
+# Planned Future Enhancements:
+- **Media Uploads**: Enable users to share images, videos, and other media within their posts.
+- **Enhanced User Profiles**: Introduce customizable user profiles with bio, links, and profile pictures.
+- **Search Functionality**: Implement a robust search feature to discover posts, users, and trending topics.
+
+# Feedback
+I appreciate your feedback! Please open an issue on GitHub if you encounter any problems or have suggestions for improvement. Your feedback helps enhance the project for everyone. Please reach out to me at duppalatagore@gmail.com
