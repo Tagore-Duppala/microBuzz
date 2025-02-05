@@ -21,4 +21,4 @@ MicroBuzz is a microblogging application that allows users to share their though
 
 # E-R Diagram:
 
-![img.png](img.png)
+![microBuzz](https://github.com/user-attachments/assets/40da50e8-1f59-4766-a4a7-56210cf6c39e)
