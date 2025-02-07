@@ -1,4 +1,4 @@
-package com.microBuzz.user_service.dto;
+package com.microBuzz.connections_service.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,11 +7,11 @@ import lombok.RequiredArgsConstructor;
 @Data
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class SignupRequestDto {
+public class NewUserDto {
 
-    private String name;
-    private String email;
-    private String password;
-    private String bio;
     private Long userId;
+    private String email;
+    private String name;
+    private String bio;
+
 }
