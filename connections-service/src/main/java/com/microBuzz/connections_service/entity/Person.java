@@ -19,6 +19,9 @@ public class Person {
     @Property("name")
     private String name;
 
-    @Property("userId")
     private Long userId;
+
+    private String email;
+
+    private String bio;
 }

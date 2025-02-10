@@ -1,18 +1,22 @@
 package com.microBuzz.user_service.service.Impl;
 
+import com.microBuzz.user_service.client.ConnectionsClient;
 import com.microBuzz.user_service.dto.LoginRequestDto;
 import com.microBuzz.user_service.dto.SignupRequestDto;
 import com.microBuzz.user_service.dto.UserDto;
 import com.microBuzz.user_service.entity.User;
+import com.microBuzz.user_service.event.UserOnboardingEvent;
 import com.microBuzz.user_service.exception.BadRequestException;
 import com.microBuzz.user_service.exception.ResourceNotFoundException;
 import com.microBuzz.user_service.repository.UserRepository;
 import com.microBuzz.user_service.service.AuthService;
 import com.microBuzz.user_service.service.JwtService;
 import com.microBuzz.user_service.utils.PasswordUtil;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,8 +27,11 @@ public class AuthServiceImpl implements AuthService{
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final JwtService jwtService;
+    private final ConnectionsClient connectionsClient;
+    private final KafkaTemplate<Long, UserOnboardingEvent> kafkaTemplate;
 
     @Override
+    @Transactional
     public UserDto signUp(SignupRequestDto signupRequestDto) {
         boolean exists = userRepository.existsByEmail(signupRequestDto.getEmail());
         if(exists) throw new BadRequestException("User already exists, Please login instead!");
@@ -33,6 +40,16 @@ public class AuthServiceImpl implements AuthService{
         user.setPassword(PasswordUtil.hashPassword(signupRequestDto.getPassword()));
 
         User savedUser = userRepository.save(user);
+        signupRequestDto.setUserId(savedUser.getId());
+        connectionsClient.createNewUser(signupRequestDto);
+
+        UserOnboardingEvent userOnboardingEvent = UserOnboardingEvent.builder()
+                        .userId(savedUser.getId())
+                        .email(user.getEmail())
+                        .name(user.getName()).build();
+
+        kafkaTemplate.send("user-onboarding-topic",savedUser.getId(), userOnboardingEvent );
+        log.info("Kafka topic - User onboarding is produced");
         return modelMapper.map(savedUser, UserDto.class);
     }
 
