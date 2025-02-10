@@ -9,6 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 
+import java.util.Arrays;
+import java.util.List;
+
 @Slf4j
 @Component
 public class AuthenticationFilter extends AbstractGatewayFilterFactory<Object> {
@@ -21,7 +24,15 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Object> {
     }
     @Override
     public GatewayFilter apply(Object config) { //This method is for adding custom filter in filter chain of API Gateway
+
         return (exchange, chain) -> {
+
+            String path = exchange.getRequest().getURI().getPath().toLowerCase();
+            boolean excluded = path.contains("/api-docs") || path.contains("/swagger-ui.html") || path.contains("/swagger-ui");
+
+            if(excluded){
+                return chain.filter(exchange);
+            }
             log.info("Login request: {}", exchange.getRequest().getURI());
 
             final String tokenHeader = exchange.getRequest().getHeaders().getFirst("Authorization");

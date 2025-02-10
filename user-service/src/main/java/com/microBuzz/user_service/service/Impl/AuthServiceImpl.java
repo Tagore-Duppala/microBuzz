@@ -5,6 +5,7 @@ import com.microBuzz.user_service.dto.LoginRequestDto;
 import com.microBuzz.user_service.dto.SignupRequestDto;
 import com.microBuzz.user_service.dto.UserDto;
 import com.microBuzz.user_service.entity.User;
+import com.microBuzz.user_service.event.UserOnboardingEvent;
 import com.microBuzz.user_service.exception.BadRequestException;
 import com.microBuzz.user_service.exception.ResourceNotFoundException;
 import com.microBuzz.user_service.repository.UserRepository;
@@ -15,6 +16,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -26,6 +28,8 @@ public class AuthServiceImpl implements AuthService{
     private final ModelMapper modelMapper;
     private final JwtService jwtService;
     private final ConnectionsClient connectionsClient;
+    private final KafkaTemplate<Long, UserOnboardingEvent> kafkaTemplate;
+
     @Override
     @Transactional
     public UserDto signUp(SignupRequestDto signupRequestDto) {
@@ -38,6 +42,14 @@ public class AuthServiceImpl implements AuthService{
         User savedUser = userRepository.save(user);
         signupRequestDto.setUserId(savedUser.getId());
         connectionsClient.createNewUser(signupRequestDto);
+
+        UserOnboardingEvent userOnboardingEvent = UserOnboardingEvent.builder()
+                        .userId(savedUser.getId())
+                        .email(user.getEmail())
+                        .name(user.getName()).build();
+
+        kafkaTemplate.send("user-onboarding-topic",savedUser.getId(), userOnboardingEvent );
+        log.info("Kafka topic - User onboarding is produced");
         return modelMapper.map(savedUser, UserDto.class);
     }
 

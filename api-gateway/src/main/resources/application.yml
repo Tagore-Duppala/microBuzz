@@ -38,3 +38,15 @@ spring:
               filters:
                 - StripPrefix=2
                 - name: AuthenticationFilter
+
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    urls:
+      - name: connections-service
+        url: api/v1/connections/api-docs
+      - name: post-service
+        url: api/v1/posts/api-docs
+      - name: user-services
+        url: api/v1/users/api-docs
