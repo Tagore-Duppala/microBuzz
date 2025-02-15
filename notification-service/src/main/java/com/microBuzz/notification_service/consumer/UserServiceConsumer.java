@@ -1,6 +1,5 @@
 package com.microBuzz.notification_service.consumer;
 
-import com.microBuzz.notification_service.repository.NotificationRepository;
 import com.microBuzz.notification_service.service.EmailSenderService;
 import com.microBuzz.user_service.event.UserOnboardingEvent;
 import lombok.RequiredArgsConstructor;

@@ -9,9 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 
-import java.util.Arrays;
-import java.util.List;
-
 @Slf4j
 @Component
 public class AuthenticationFilter extends AbstractGatewayFilterFactory<Object> {
@@ -51,7 +48,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Object> {
                         .request(r -> r.header("X-User-id", userId))
                         .build();
                 log.info("final request headers are : {}",modifiedExchange.getRequest().getHeaders());
-                return chain.filter(modifiedExchange); //Pass the request to next filters   
+                return chain.filter(modifiedExchange); //Pass the request to next filters
 
             }
             catch (JwtException e){

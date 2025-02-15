@@ -15,29 +15,30 @@ spring:
         defaultZone: http://localhost:8761/eureka
   cloud:
     gateway:
-          routes:
-            - id: user-services
-              uri: lb://USER-SERVICE
-              predicates:
-                - Path=/api/v1/users/**
-              filters:
-                - StripPrefix=2
+      routes:
+        - id: user-services
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/v1/users/**
+          filters:
+            - StripPrefix=2
 
-            - id: post-service
-              uri: lb://POST-SERVICE
-              predicates:
-                - Path=/api/v1/posts/**
-              filters:
-                - StripPrefix=2
-                - name: AuthenticationFilter
+        - id: post-service
+          uri: lb://POST-SERVICE
+          predicates:
+            - Path=/api/v1/posts/**
+          filters:
+            - StripPrefix=2
+            - name: AuthenticationFilter
 
-            - id: connections-service
-              uri: lb://CONNECTIONS-SERVICE
-              predicates:
-                - Path=/api/v1/connections/**
-              filters:
-                - StripPrefix=2
-                - name: AuthenticationFilter
+        - id: connections-service
+          uri: lb://CONNECTIONS-SERVICE
+          predicates:
+            - Path=/api/v1/connections/**
+          filters:
+            - StripPrefix=2
+            - name: AuthenticationFilter
+            - name: RateLimitFilter
 
 springdoc:
   swagger-ui:
@@ -50,3 +51,13 @@ springdoc:
         url: api/v1/posts/api-docs
       - name: user-services
         url: api/v1/users/api-docs
+
+
+resilience4j.ratelimiter:
+  instances:
+    apiRateLimiter:
+      limitForPeriod: 10  # Number of requests allowed per period
+      limitRefreshPeriod: 60s  # Period to refresh the limit (60 seconds)
+      timeoutDuration: 500ms
+
+
