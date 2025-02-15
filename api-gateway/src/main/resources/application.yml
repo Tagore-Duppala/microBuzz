@@ -30,6 +30,7 @@ spring:
           filters:
             - StripPrefix=2
             - name: AuthenticationFilter
+            - name: RateLimitFilter
 
         - id: connections-service
           uri: lb://CONNECTIONS-SERVICE

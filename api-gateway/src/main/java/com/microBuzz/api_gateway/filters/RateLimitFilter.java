@@ -14,16 +14,20 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class RateLimitFilter extends AbstractGatewayFilterFactory<Object> {
 
-    private final RateLimiter rateLimiter;
+    private final RateLimiterRegistry rateLimiterRegistry;
 
     public RateLimitFilter(RateLimiterRegistry rateLimiterRegistry){ //RateLimiterRegistry is used to find instances of resilience
-        this.rateLimiter = rateLimiterRegistry.rateLimiter("apiRateLimiter");
+        this.rateLimiterRegistry = rateLimiterRegistry;
     }
 
 
     @Override
     public GatewayFilter apply(Object config) {
         return (exchange, chain) -> {
+
+            String userId = exchange.getRequest().getHeaders().getFirst("X-User-id");
+
+            RateLimiter rateLimiter = rateLimiterRegistry.rateLimiter(userId);
 
                 if (rateLimiter.acquirePermission()) {
                     // Proceed with the request if allowed
