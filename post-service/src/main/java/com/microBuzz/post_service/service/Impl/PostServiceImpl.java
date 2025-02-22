@@ -30,44 +30,62 @@ public class PostServiceImpl implements PostService {
 
     public PostDto createPost(PostCreateRequestDto postDto) {
 
-        Long userId = Long.valueOf(UserContextHolder.getCurrentUserId());
-        log.info("Creating the post for user with user id: {}",userId);
-        Post post = modelMapper.map(postDto, Post.class);
-        post.setUserId(userId);
+        try {
+            Long userId = Long.valueOf(UserContextHolder.getCurrentUserId());
+            log.info("Creating the post for user with user id: {}", userId);
+            Post post = modelMapper.map(postDto, Post.class);
+            post.setUserId(userId);
 
-        Post savedPost = postRepository.save(post);
+            Post savedPost = postRepository.save(post);
 
-        PostCreatedEvent postCreatedEvent = PostCreatedEvent.builder()
-                .postId(savedPost.getId())
-                .creatorId(savedPost.getUserId())
-                .content(savedPost.getContent())
-                .build();
+            PostCreatedEvent postCreatedEvent = PostCreatedEvent.builder()
+                    .postId(savedPost.getId())
+                    .creatorId(savedPost.getUserId())
+                    .content(savedPost.getContent())
+                    .build();
 
-        kafkaTemplate.send("post-created-topic",postCreatedEvent);
+            kafkaTemplate.send("post-created-topic", postCreatedEvent);
 
-        return modelMapper.map(savedPost, PostDto.class);
+            return modelMapper.map(savedPost, PostDto.class);
+        }
+        catch (Exception ex) {
+            log.error("Exception occurred in createPost , Error Msg: {}", ex.getMessage());
+            throw new RuntimeException("Exception occurred in createPost: "+ex.getMessage());
+        }
     }
 
     public PostDto getPostById(Long postId) {
-        Long userId = Long.valueOf(UserContextHolder.getCurrentUserId());
-        log.info("Retrieving post with ID: {}", postId);
-        log.info("Current user is: {}", userId);
-        Post post = postRepository.findById(postId).orElseThrow(() ->
-                new RuntimeException("Post not found with id: "+postId));
-        return modelMapper.map(post, PostDto.class);
+
+        try {
+            Long userId = Long.valueOf(UserContextHolder.getCurrentUserId());
+            log.info("Retrieving post with ID: {}", postId);
+            log.info("Current user is: {}", userId);
+            Post post = postRepository.findById(postId).orElseThrow(() ->
+                    new RuntimeException("Post not found with id: " + postId));
+            return modelMapper.map(post, PostDto.class);
+        } catch (Exception ex) {
+            log.error("Exception occurred in getPostById , Error Msg: {}", ex.getMessage());
+            throw new RuntimeException("Exception occurred in getPostById: "+ex.getMessage());
+        }
     }
 
     public List<PostDto> getAllPostsOfUser() {
 
-        Long userId = Long.valueOf(UserContextHolder.getCurrentUserId());
-        log.info("Current user is: {}", userId);
-        List<Post> posts = postRepository.findByUserId(userId);
+        try {
+            Long userId = Long.valueOf(UserContextHolder.getCurrentUserId());
+            log.info("Current user is: {}", userId);
+            List<Post> posts = postRepository.findByUserId(userId);
 
-        List<PersonDto> connections = connectionsClient.getMyFirstConnections();
+            List<PersonDto> connections = connectionsClient.getMyFirstConnections();
 
-        return posts
-                .stream()
-                .map((element) -> modelMapper.map(element, PostDto.class))
-                .collect(Collectors.toList());
+            return posts
+                    .stream()
+                    .map((element) -> modelMapper.map(element, PostDto.class))
+                    .collect(Collectors.toList());
+        }
+        catch (Exception ex) {
+            log.error("Exception occurred in getAllPostsOfUser , Error Msg: {}", ex.getMessage());
+            throw new RuntimeException("Exception occurred in getAllPostsOfUser: "+ex.getMessage());
+        }
     }
 }

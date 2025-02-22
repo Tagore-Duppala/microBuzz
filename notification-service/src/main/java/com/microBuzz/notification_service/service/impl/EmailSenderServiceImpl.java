@@ -29,8 +29,9 @@ public class EmailSenderServiceImpl implements EmailSenderService {
             javaMailSender.send(message);
             log.info("Email sent successfully!");
         }
-        catch (Exception e){
-            log.error("Cannot send email "+ e.getMessage());
+        catch (Exception ex){
+            log.error("Cannot send email: {}", ex.getMessage());
+            throw new RuntimeException("Exception occurred in sendEmail, Error Msg: "+ ex.getMessage());
         }
 
     }

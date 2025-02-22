@@ -33,37 +33,49 @@ public class AuthServiceImpl implements AuthService{
     @Override
     @Transactional
     public UserDto signUp(SignupRequestDto signupRequestDto) {
-        boolean exists = userRepository.existsByEmail(signupRequestDto.getEmail());
-        if(exists) throw new BadRequestException("User already exists, Please login instead!");
 
-        User user = modelMapper.map(signupRequestDto, User.class);
-        user.setPassword(PasswordUtil.hashPassword(signupRequestDto.getPassword()));
+        try {
+            boolean exists = userRepository.existsByEmail(signupRequestDto.getEmail());
+            if (exists) throw new BadRequestException("User already exists, Please login instead!");
 
-        User savedUser = userRepository.save(user);
-        signupRequestDto.setUserId(savedUser.getId());
-        connectionsClient.createNewUser(signupRequestDto);
+            User user = modelMapper.map(signupRequestDto, User.class);
+            user.setPassword(PasswordUtil.hashPassword(signupRequestDto.getPassword()));
 
-        UserOnboardingEvent userOnboardingEvent = UserOnboardingEvent.builder()
-                        .userId(savedUser.getId())
-                        .email(user.getEmail())
-                        .name(user.getName()).build();
+            User savedUser = userRepository.save(user);
+            signupRequestDto.setUserId(savedUser.getId());
+            connectionsClient.createNewUser(signupRequestDto);
 
-        kafkaTemplate.send("user-onboarding-topic",savedUser.getId(), userOnboardingEvent );
-        log.info("Kafka topic - User onboarding is produced");
-        return modelMapper.map(savedUser, UserDto.class);
+            UserOnboardingEvent userOnboardingEvent = UserOnboardingEvent.builder()
+                    .userId(savedUser.getId())
+                    .email(user.getEmail())
+                    .name(user.getName()).build();
+
+            kafkaTemplate.send("user-onboarding-topic", savedUser.getId(), userOnboardingEvent);
+            log.info("Kafka topic - User onboarding is produced");
+            return modelMapper.map(savedUser, UserDto.class);
+        } catch (Exception ex) {
+            log.error("Exception occurred in signUp , Error Msg: {}", ex.getMessage());
+            throw new RuntimeException("Exception occurred in signUp: "+ex.getMessage());
+        }
     }
 
     @Override
     public String login(LoginRequestDto loginRequestDto) {
-        User user = userRepository.findByEmail(loginRequestDto.getEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: "+loginRequestDto.getEmail()));
 
-        boolean isPasswordMatch = PasswordUtil.checkPassword(loginRequestDto.getPassword(), user.getPassword());
+        try {
+            User user = userRepository.findByEmail(loginRequestDto.getEmail())
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + loginRequestDto.getEmail()));
 
-        if(!isPasswordMatch) {
-            throw new BadRequestException("Incorrect password");
+            boolean isPasswordMatch = PasswordUtil.checkPassword(loginRequestDto.getPassword(), user.getPassword());
+
+            if (!isPasswordMatch) {
+                throw new BadRequestException("Incorrect password");
+            }
+
+            return jwtService.generateAccessToken(user);
+        } catch (Exception ex) {
+            log.error("Exception occurred in login , Error Msg: {}", ex.getMessage());
+            throw new RuntimeException("Exception occurred in login: "+ex.getMessage());
         }
-
-        return jwtService.generateAccessToken(user);
     }
 }
