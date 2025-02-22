@@ -28,50 +28,62 @@ public class PostLikeServiceImpl implements PostLikeService {
 
     @Override
     public void likePost(Long postId) {
-        log.info("Liking post with post id {} is in process", postId);
 
-        Long userId = Long.valueOf(UserContextHolder.getCurrentUserId());
+        try {
+            log.info("Liking post with post id {} is in process", postId);
 
-        Post post = postRepository.findById(postId)
-                .orElseThrow(()-> new ResourceNotFoundException("Post not found with id: "+ postId));
+            Long userId = Long.valueOf(UserContextHolder.getCurrentUserId());
 
-        Boolean isLiked = postLikeRepository.existsByUserIdAndPostId(userId, postId);
-        if(isLiked) throw new BadRequestException("Post is already liked, Cannot like again");
+            Post post = postRepository.findById(postId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Post not found with id: " + postId));
 
-        PostLike postLike = new PostLike();
+            Boolean isLiked = postLikeRepository.existsByUserIdAndPostId(userId, postId);
+            if (isLiked) throw new BadRequestException("Post is already liked, Cannot like again");
 
-        postLike.setPostId(postId);
-        postLike.setUserId(userId);
+            PostLike postLike = new PostLike();
 
-        postLikeRepository.save(postLike);
-        log.info("Post is liked successfully!");
+            postLike.setPostId(postId);
+            postLike.setUserId(userId);
 
-        PostLikedEvent postLikedEvent = PostLikedEvent.builder()
-                .postId(postId)
-                .creatorId(post.getUserId())
-                .likedByUserId(userId)
-                .build();
-        log.info("post liked event created successfully!!");
+            postLikeRepository.save(postLike);
+            log.info("Post is liked successfully!");
 
-        kafkaTemplate.send("post-liked-topic",postId,postLikedEvent);
-        log.info("post-liked-topic message sent, {}", postLikedEvent);
+            PostLikedEvent postLikedEvent = PostLikedEvent.builder()
+                    .postId(postId)
+                    .creatorId(post.getUserId())
+                    .likedByUserId(userId)
+                    .build();
+            log.info("post liked event created successfully!!");
+
+            kafkaTemplate.send("post-liked-topic", postId, postLikedEvent);
+            log.info("post-liked-topic message sent, {}", postLikedEvent);
+        } catch (Exception ex) {
+            log.error("Exception occurred in likePost , Error Msg: {}", ex.getMessage());
+            throw new RuntimeException("Exception occurred in likePost: "+ex.getMessage());
+        }
     }
 
     @Override
     @Transactional
     public void unlikePost(Long postId) {
-        log.info("Unliking post wiht post id {} is in process", postId);
 
-        Long userId = Long.valueOf(UserContextHolder.getCurrentUserId());
+        try {
+            log.info("Unliking post wiht post id {} is in process", postId);
 
-        Post post = postRepository.findById(postId)
-                .orElseThrow(()-> new ResourceNotFoundException("Post not found with id: "+ postId));
+            Long userId = Long.valueOf(UserContextHolder.getCurrentUserId());
 
-        Boolean isLiked = postLikeRepository.existsByUserIdAndPostId(userId, postId);
-        if(!isLiked) throw new BadRequestException("Post is not liked, Cannot unlike");
+            Post post = postRepository.findById(postId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Post not found with id: " + postId));
 
-        postLikeRepository.deleteByUserIdAndPostId(userId, postId);
+            Boolean isLiked = postLikeRepository.existsByUserIdAndPostId(userId, postId);
+            if (!isLiked) throw new BadRequestException("Post is not liked, Cannot unlike");
 
-        log.info("post with id {} unliked successfully",postId);
+            postLikeRepository.deleteByUserIdAndPostId(userId, postId);
+
+            log.info("post with id {} unliked successfully", postId);
+        } catch (Exception ex) {
+            log.error("Exception occurred in unlikePost , Error Msg: {}", ex.getMessage());
+            throw new RuntimeException("Exception occurred in unlikePost: "+ex.getMessage());
+        }
     }
 }

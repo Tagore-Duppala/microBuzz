@@ -1,5 +1,6 @@
 package com.microBuzz.connections_service.entity;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
@@ -10,6 +11,7 @@ import org.springframework.data.neo4j.core.schema.Property;
 @Node
 @Getter
 @Setter
+@Builder
 public class Person {
 
     @Id

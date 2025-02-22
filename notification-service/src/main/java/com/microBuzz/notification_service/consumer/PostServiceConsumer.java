@@ -25,13 +25,19 @@ public class PostServiceConsumer {
     @KafkaListener(topics = "post-created-topic")
     public void handlePostCreated(PostCreatedEvent postCreatedEvent){
 
-        log.info("Sending notifications: handlePostCreated: {}", postCreatedEvent);
-        List<PersonDto> firstDegreeConnections= connectionsClient.getMyFirstConnections(postCreatedEvent.getCreatorId());
+        try {
+            log.info("Sending notifications: handlePostCreated: {}", postCreatedEvent);
+            List<PersonDto> firstDegreeConnections = connectionsClient.getMyFirstConnections(postCreatedEvent.getCreatorId());
 
-        for(PersonDto connection: firstDegreeConnections){
-            log.info("Sending notification for user, Current user is: {}",connection.getUserId());
-            sendNotification(connection.getUserId(), "Your connection "+postCreatedEvent.getCreatorId()+ " posted something "
-                            + " check it out!", Type.POST);
+            for (PersonDto connection : firstDegreeConnections) {
+                log.info("Sending notification for user, Current user is: {}", connection.getUserId());
+                sendNotification(connection.getUserId(), "Your connection " + postCreatedEvent.getCreatorId() + " posted something "
+                        + " check it out!", Type.POST);
+
+            }
+        } catch (Exception ex) {
+            log.error("Exception occurred in handlePostCreated , Error Msg: {}", ex.getMessage());
+            throw new RuntimeException("Exception occurred in handlePostCreated: "+ex.getMessage());
         }
 
     }
@@ -39,21 +45,32 @@ public class PostServiceConsumer {
     @KafkaListener(topics = "post-liked-topic")
     public void handlePostLiked(PostLikedEvent postLikedEvent){
 
-        log.info("Sending notifications: handlePostLiked: {}", postLikedEvent);
-        String message = String.format("Your post, %d has been liked by %d", postLikedEvent.getPostId(), postLikedEvent.getLikedByUserId());
-        sendNotification(postLikedEvent.getCreatorId(), message, Type.LIKE);
-        log.info("Notification sent for user: {}", postLikedEvent.getCreatorId());
+        try {
+            log.info("Sending notifications: handlePostLiked: {}", postLikedEvent);
+            String message = String.format("Your post, %d has been liked by %d", postLikedEvent.getPostId(), postLikedEvent.getLikedByUserId());
+            sendNotification(postLikedEvent.getCreatorId(), message, Type.LIKE);
+            log.info("Notification sent for user: {}", postLikedEvent.getCreatorId());
+        } catch (Exception ex) {
+            log.error("Exception occurred in handlePostLiked , Error Msg: {}", ex.getMessage());
+            throw new RuntimeException("Exception occurred in handlePostLiked: "+ex.getMessage());
+        }
 
     }
 
     public void sendNotification(Long userId, String message, Type category){
-        Notification notification = new Notification();
 
-        notification.setUserId(userId);
-        notification.setMessage(message);
-        notification.setCategory(category);
+        try {
+            Notification notification = new Notification();
 
-        notificationRepository.save(notification);
-        log.info("Successfully saved the notification for user with id {}",userId);
+            notification.setUserId(userId);
+            notification.setMessage(message);
+            notification.setCategory(category);
+
+            notificationRepository.save(notification);
+            log.info("Successfully saved the notification for user with id {}", userId);
+        } catch (Exception ex) {
+            log.error("Exception occurred in sendNotification , Error Msg: {}", ex.getMessage());
+            throw new RuntimeException("Exception occurred in sendNotification: "+ex.getMessage());
+        }
     }
 }
