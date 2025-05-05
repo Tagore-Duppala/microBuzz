@@ -10,6 +10,7 @@
         <module name="post-service" />
         <module name="user-service" />
         <module name="discovery-server" />
+        <module name="uploader-service" />
       </profile>
       <profile name="Annotation profile for api-gateway" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -40,6 +41,7 @@
       <module name="discovery-server" options="-parameters" />
       <module name="notification-service" options="-parameters" />
       <module name="post-service" options="-parameters" />
+      <module name="uploader-service" options="-parameters" />
       <module name="user-service" options="-parameters" />
     </option>
   </component>

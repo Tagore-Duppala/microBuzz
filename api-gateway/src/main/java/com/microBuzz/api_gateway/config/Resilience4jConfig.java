@@ -10,7 +10,6 @@ public class Resilience4jConfig {
 
     @Bean
     public RateLimiterRegistry rateLimiterRegistry() {
-        // Configure the RateLimiter
         RateLimiterConfig rateLimiterConfig = RateLimiterConfig.custom()
                 .limitForPeriod(10)  // 10 requests per second
                 .limitRefreshPeriod(java.time.Duration.ofSeconds(60))  // Refresh per second
