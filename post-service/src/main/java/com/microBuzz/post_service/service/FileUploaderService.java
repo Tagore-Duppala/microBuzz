@@ -1,4 +1,4 @@
-package com.microBuzz.uploader_service.service;
+package com.microBuzz.post_service.service;
 
 import org.springframework.web.multipart.MultipartFile;
 

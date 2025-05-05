@@ -8,12 +8,14 @@ import com.microBuzz.post_service.dto.PostDto;
 import com.microBuzz.post_service.entity.Post;
 import com.microBuzz.post_service.event.PostCreatedEvent;
 import com.microBuzz.post_service.repository.PostRepository;
+import com.microBuzz.post_service.service.FileUploaderService;
 import com.microBuzz.post_service.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,14 +29,21 @@ public class PostServiceImpl implements PostService {
     private final ModelMapper modelMapper;
     private final ConnectionsClient connectionsClient;
     private final KafkaTemplate<Long, PostCreatedEvent> kafkaTemplate;
+    private final FileUploaderService fileUploaderService;
 
-    public PostDto createPost(PostCreateRequestDto postDto) {
+    public PostDto createPost(PostCreateRequestDto postDto, MultipartFile image) {
 
         try {
             Long userId = Long.valueOf(UserContextHolder.getCurrentUserId());
             log.info("Creating the post for user with user id: {}", userId);
             Post post = modelMapper.map(postDto, Post.class);
             post.setUserId(userId);
+
+            if(!image.isEmpty()){
+                String imageUrl = fileUploaderService.upload(image);
+                log.info("Successfully uploaded the image!");
+                post.setImageUrl(imageUrl);
+            }
 
             Post savedPost = postRepository.save(post);
 
