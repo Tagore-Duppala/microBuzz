@@ -4,13 +4,14 @@ MicroBuzz is a microblogging application that allows users to share their though
 
 # Key Features of MicroBuzz:
 
-- **Text-Based Microblogging**: Share short, concise text posts with ease.
-- **Real-Time Interaction**: Engage with other users through instant updates and interactions.
-- **Microservice Architecture**: Scalable and maintainable design using four microservices for optimized performance.
-- **Eureka Service Registry**: Utilizes Eureka for efficient service discovery and management.
-- **User Registration & Authentication**: Secure user sign-up and login for personalized experience.
-- **Scalability**: The microservice-based architecture allows for easy scaling as the user base grows.
-- **Lightweight Design**: Focuses on delivering a simple and intuitive user experience with no media uploads (for now).
+- **Concise Text & Image Sharing**: Enables users to quickly post short text updates and images, capturing moments instantly.
+- **Real-Time Feed & Interactions**: Delivers instant timeline updates and seamless user engagement through likes, comments, and shares.
+- **Scalable Microservice Architecture**: Built with four microservices to ensure high availability, fault isolation, and easy feature scaling.
+- **Eureka Service Registry**: Employs Eureka for efficient service discovery, load balancing, and fault tolerance across services.
+- **Robust Rate Limiting**: Implements request throttling to protect against DDoS attacks and ensure platform stability.
+- **Secure User Authentication**: Facilitates safe user sign-up and login with strong authentication to protect user accounts.
+- **Elastic Scalability**: Architecture supports effortless scaling to handle increasing user traffic and growing content volume.
+- **Minimalistic & Fast**: Focuses on a lightweight, user-friendly experience without media uploads (planned for future versions).
 
 
 # System Design
