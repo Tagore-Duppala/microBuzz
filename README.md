@@ -26,7 +26,8 @@ MicroBuzz is a microblogging application that allows users to share their though
 
 
 # Planned Future Enhancements:
-- **Media Uploads**: Enable users to share images, videos, and other media within their posts.
+- **Comment & Share feature**: Enable users to comment, share and re-post.
+- **Media Uploads**: Enable users to share videos, and other media within their posts.
 - **Enhanced User Profiles**: Introduce customizable user profiles with bio, links, and profile pictures.
 - **Search Functionality**: Implement a robust search feature to discover posts, users, and trending topics.
 - **UI/UX Improvements**: Introducing a responsive and visually appealing frontend interface to complement the backend functionalities.
