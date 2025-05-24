@@ -3,10 +3,12 @@ package com.microBuzz.post_service.controller;
 import com.microBuzz.post_service.dto.PostCreateRequestDto;
 import com.microBuzz.post_service.dto.PostDto;
 import com.microBuzz.post_service.service.PostService;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -18,8 +20,8 @@ public class PostsController {
     private final PostService postService;
 
     @PostMapping("/createPost")
-    public ResponseEntity<PostDto> createPost(@RequestBody PostCreateRequestDto postDto) {
-        PostDto createdPost = postService.createPost(postDto);
+    public ResponseEntity<PostDto> createPost(@RequestPart @NonNull PostCreateRequestDto postDto, @RequestPart MultipartFile image) {
+        PostDto createdPost = postService.createPost(postDto, image);
         return new ResponseEntity<>(createdPost, HttpStatus.CREATED);
     }
 

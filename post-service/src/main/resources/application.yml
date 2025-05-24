@@ -4,3 +4,8 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.LongSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+cloudinary:
+  cloud-name: dqtq0a8dy
+  api-key: 982913241192358
+  api-secret: J6tXjXwDkqBvgThE2I7JhD_A7Q0
